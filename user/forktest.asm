@@ -45,7 +45,7 @@ forktest(void)
 
   print("fork test\n");
   32:	00000517          	auipc	a0,0x0
-  36:	3ae50513          	addi	a0,a0,942 # 3e0 <uptime+0x8>
+  36:	3c650513          	addi	a0,a0,966 # 3f8 <stats+0xe>
   3a:	fc7ff0ef          	jal	0 <print>
 
   for(n=0; n<N; n++){
@@ -67,7 +67,7 @@ forktest(void)
   if(n == N){
     print("fork claimed to work N times!\n");
   54:	00000517          	auipc	a0,0x0
-  58:	3dc50513          	addi	a0,a0,988 # 430 <uptime+0x58>
+  58:	3f450513          	addi	a0,a0,1012 # 448 <stats+0x5e>
   5c:	fa5ff0ef          	jal	0 <print>
     exit(1);
   60:	4505                	li	a0,1
@@ -80,7 +80,7 @@ forktest(void)
     if(wait(0) < 0){
       print("wait stopped early\n");
   6a:	00000517          	auipc	a0,0x0
-  6e:	38650513          	addi	a0,a0,902 # 3f0 <uptime+0x18>
+  6e:	39e50513          	addi	a0,a0,926 # 408 <stats+0x1e>
   72:	f8fff0ef          	jal	0 <print>
       exit(1);
   76:	4505                	li	a0,1
@@ -91,7 +91,7 @@ forktest(void)
   if(wait(0) != -1){
     print("wait got too many\n");
   7c:	00000517          	auipc	a0,0x0
-  80:	38c50513          	addi	a0,a0,908 # 408 <uptime+0x30>
+  80:	3a450513          	addi	a0,a0,932 # 420 <stats+0x36>
   84:	f7dff0ef          	jal	0 <print>
     exit(1);
   88:	4505                	li	a0,1
@@ -114,7 +114,7 @@ forktest(void)
 
   print("fork test OK\n");
   ac:	00000517          	auipc	a0,0x0
-  b0:	37450513          	addi	a0,a0,884 # 420 <uptime+0x48>
+  b0:	38c50513          	addi	a0,a0,908 # 438 <stats+0x4e>
   b4:	f4dff0ef          	jal	0 <print>
 }
   b8:	60e2                	ld	ra,24(sp)
@@ -781,3 +781,25 @@ uptime:
  3da:	00000073          	ecall
  ret
  3de:	8082                	ret
+
+00000000000003e0 <trace>:
+///////
+.global trace
+trace:
+  li a7, SYS_trace
+ 3e0:	03300893          	li	a7,51
+  ecall
+ 3e4:	00000073          	ecall
+  ret
+ 3e8:	8082                	ret
+
+00000000000003ea <stats>:
+
+.global stats
+stats:
+  li a7, SYS_stats
+ 3ea:	03400893          	li	a7,52
+  ecall
+ 3ee:	00000073          	ecall
+  ret
+ 3f2:	8082                	ret

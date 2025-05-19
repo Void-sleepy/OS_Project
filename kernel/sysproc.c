@@ -101,16 +101,13 @@ sys_uptime(void)
 extern uint64 syscall_counts[];
 extern char *syscall_names[];
 
-extern int NELEM(void*);
 
-uint64 sys_trace(void) {
+uint64 sys_trace(void){
   int mask;
-  struct proc *p = myproc();
   
-  if(argint(0, &mask) < 0)
-    return -1;
-    
-  p->trace_mask = mask;
+  argint(0, &mask);
+  
+  myproc()->trace_mask = mask;
   return 0;
 }
 
