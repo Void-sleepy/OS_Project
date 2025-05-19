@@ -102,6 +102,7 @@ extern uint64 sys_link(void);
 extern uint64 sys_mkdir(void);
 extern uint64 sys_close(void);
 
+
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
 static uint64 (*syscalls[])(void) = {
@@ -127,6 +128,8 @@ static uint64 (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_stat]   sys_fstat, // NEW: Added for statistics system call
+[SYS_trace] sys_trace,
+[SYS_stats] sys_stats,
 };
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -154,9 +157,7 @@ static char *syscall_names[] = {
   [SYS_link]    = "link",
   [SYS_mkdir]   = "mkdir",
   [SYS_close]   = "close",
-  [SYS_trace]   = "trace",
 
-  [SYS_close]   = "close",
   [SYS_trace]   = "trace",
   [SYS_lseek]   = "lseek",
   [SYS_stat]   = "stats", // NEW: Added for statistics system call
