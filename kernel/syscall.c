@@ -152,7 +152,7 @@ static char *syscall_names[] = {
   [SYS_link]    = "link",
   [SYS_mkdir]   = "mkdir",
   [SYS_close]   = "close",
-  
+
 
   [SYS_trace]   = "trace",
 
@@ -280,10 +280,10 @@ void print_syscall(struct proc *p, int num, uint64 ret)
       if(read_string(p, p->trapframe->a0, filename, sizeof(filename)) >= 0) {
         printf("\"%s\"", filename);
       } else {
-        printf("0x%x", p->trapframe->a0);
+        printf("0x%lx", p->trapframe->a0);
       }
       // Second argument is flags (mode)
-      printf(", %d", p->trapframe->a1);
+      printf(", %ld", p->trapframe->a1);
     }
     break;
   case SYS_read:
@@ -293,7 +293,7 @@ void print_syscall(struct proc *p, int num, uint64 ret)
       // After the call, if successful, try to display buffer contents
       if((int)ret > 0 && (int)ret <= 32) { // Limit to 32 bytes
         char buf[33]; // +1 for null terminator
-        if(read_pmemory(p, p->trapframe->a1, buf, ret) >= 0) {
+        if(read_memory(p, p->trapframe->a1, buf, ret) >= 0) {
           buf[ret] = '\0'; // Null terminate
           
           // Check if it's a printable string
