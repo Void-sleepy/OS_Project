@@ -146,6 +146,9 @@ found:
   p->context.ra = (uint64)forkret;
   p->context.sp = p->kstack + PGSIZE;
 
+  // Initialize tracing mask for system call tracing
+  p->trace_mask = 0;
+
   return p;
 }
 
