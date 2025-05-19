@@ -96,23 +96,30 @@ sys_uptime(void)
 
 
 /////////////////////////////////////////////////////////////
-uint64 sys_trace(void)
-{
+
+extern uint64 syscall_counts[];
+extern char* syscall_names[];
+extern int NELEM(void*);
+
+uint64 sys_trace(void) {
   int mask;
+  struct proc *p = myproc();
   
   if(argint(0, &mask) < 0)
     return -1;
     
-  myproc()->trace_mask = mask;
+  p->trace_mask = mask;
   return 0;
 }
 
 
 uint64 sys_stats(void) {
-    for (int i = 0; i < NELEM(syscall_names); i++) {
-        if (syscall_counts[i] && syscall_names[i]) {
-            printf("%s: %ld calls\n", syscall_names[i], syscall_counts[i]);
-        }
-    }
-    return 0;
+  int i;
+  for(i = 1; i < NELEM(syscall_names); i++) {
+    if(syscall_names[i])
+      printf("%s: %ld\n", syscall_names[i], syscall_counts[i]);
+  }
+  return 0;
 }
+
+

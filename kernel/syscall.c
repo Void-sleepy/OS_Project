@@ -171,8 +171,9 @@ int read_string(struct proc *p, uint64 addr, char *buf, int max);
 int read_memory(struct proc *p, uint64 addr, char *buf, int n);
 void print_syscall(struct proc *p, int num, uint64 ret);
 //[                                                                    ]//
-static uint64 syscall_counts[NELEM(syscall_names)];
+ // static uint64 syscall_counts[NELEM(syscall_names)];
 
+uint64 syscall_counts[64] = {0};
 
 ////////////[OLD SYS CALL ]/////////////////////////////////////////////////////
 /*
@@ -200,20 +201,28 @@ syscall(void)
 // System call dispatcher with statistics
 void syscall(void)
 {
-    int num;
-    struct proc *p = myproc();
-    num = p->trapframe->a7;
-    if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-        uint64 ret = syscalls[num]();
-        p->trapframe->a0 = ret;
-        if(p->trace_mask & (1 << num)) {
-            print_syscall(p, num, ret);
-        }
-    } else {
-        printf("%d: unknown sys call %d\n", p->pid, num);
-        p->trapframe->a0 = -1;
+  int num;
+  struct proc *p = myproc();
+
+  num = p->trapframe->a7;
+  if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+    // Save the system call number
+    p->trapframe->a0 = syscalls[num]();
+    
+    // Increment the count for this system call
+    syscall_counts[num]++;
+    
+    // If process is being traced and the mask includes this syscall
+    if(p->trace_mask & (1 << num)) {
+      printf("%d: syscall %s -> %ld\n", p->pid, syscall_names[num], p->trapframe->a0);
     }
+  } else {
+    printf("%d %s: unknown sys call %d\n",
+            p->pid, p->name, num);
+    p->trapframe->a0 = -1;
+  }
 }
+
 
 ///////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
