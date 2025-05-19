@@ -101,7 +101,9 @@ extern uint64 sys_unlink(void);
 extern uint64 sys_link(void);
 extern uint64 sys_mkdir(void);
 extern uint64 sys_close(void);
-
+/////////////////////////////////
+extern uint64 sys_trace(void);
+extern uint64 sys_stats(void);
 
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
@@ -127,9 +129,8 @@ static uint64 (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
-[SYS_stat]   sys_fstat, // NEW: Added for statistics system call
-[SYS_trace] SYS_trace,
-[SYS_stats] SYS_stats,
+[SYS_stats] sys_stats, // if he didn't use the mothod am uninstaling hsr
+[SYS_trace] sys_trace, 
 };
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -196,18 +197,6 @@ syscall(void)
 */
 
 ////////////////[New sys call  the "coooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooler one" ]////////////////////////////////////////////
-
-// NEW: System call to print statistics
-uint64 sys_stats(void) {
-    for (int i = 0; i < NELEM(syscall_names); i++) {
-        if (syscall_counts[i] && syscall_names[i]) {
-            printf("%s: %ld calls\n", syscall_names[i], syscall_counts[i]);
-        }
-    }
-    return 0;
-}
-
-
 // System call dispatcher with statistics
 void syscall(void)
 {

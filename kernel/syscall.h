@@ -1,8 +1,5 @@
 // System call numbers
 
-#define SYS_trace   22
-#define SYS_stats   23
-
 #define SYS_fork    1
 #define SYS_exit    2
 #define SYS_wait    3
@@ -60,6 +57,8 @@
 #define SYS_truncate 49
 #define SYS_ftruncate 50
 #define SYS_trace  51
+
+#define SYS_stats   52
 
 
 //////////////////////////////////////////////////////////////////////////////
