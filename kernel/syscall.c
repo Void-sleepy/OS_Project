@@ -126,11 +126,12 @@ static uint64 (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
-[SYS_stats]   sys_stats, // NEW: Added for statistics system call
+[SYS_stat]   sys_fstat, // NEW: Added for statistics system call
 };
 
 //////////////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////
 static char *syscall_names[] = {
   [SYS_fork]    = "fork",
   [SYS_exit]    = "exit",
@@ -158,7 +159,7 @@ static char *syscall_names[] = {
   [SYS_close]   = "close",
   [SYS_trace]   = "trace",
   [SYS_lseek]   = "lseek",
-  [SYS_stats]   = "stats", // NEW: Added for statistics system call
+  [SYS_stat]   = "stats", // NEW: Added for statistics system call
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -168,6 +169,7 @@ int read_string(struct proc *p, uint64 addr, char *buf, int max);
 int read_memory(struct proc *p, uint64 addr, char *buf, int n);
 void print_syscall(struct proc *p, int num, uint64 ret);
 //[                                                                    ]//
+static uint64 syscall_counts[NELEM(syscall_names)];
 
 
 ////////////[OLD SYS CALL ]/////////////////////////////////////////////////////
@@ -205,6 +207,7 @@ uint64 sys_stats(void) {
 }
 
 
+// System call dispatcher with statistics
 void syscall(void)
 {
     int num;
@@ -261,7 +264,6 @@ int read_memory(struct proc *p, uint64 addr, char *buf, int n) {
   return n;
 }
 
-
 //////////////////////////////////////////////////////////////
 
 
@@ -276,7 +278,7 @@ void print_syscall(struct proc *p, int num, uint64 ret) {
         } else {
             printf("0x%lx", p->trapframe->a0);
         }
-        printf(", %ld, 0%o", p->trapframe->a1, p->trapframe->a2); // CHANGED: Added mode
+        printf(", %ld, 0%lo", p->trapframe->a1, p->trapframe->a2); // CHANGED: Added mode
         break;
     }
     case SYS_read: {
@@ -320,24 +322,6 @@ void print_syscall(struct proc *p, int num, uint64 ret) {
     printf(") = %ld\n", ret); // CHANGED: Aligned with strace format
 }
 
-
-// System call dispatcher with statistics
-void syscall(void) {
-    int num;
-    struct proc *p = myproc();
-    num = p->trapframe->a7;
-    if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-        syscall_counts[num]++; // NEW: Increment counter
-        uint64 ret = syscalls[num]();
-        p->trapframe->a0 = ret;
-        if (p->trace_mask & (1 << num)) {
-            print_syscall(p, num, ret);
-        }
-    } else {
-        printf("%d: unknown sys call %d\n", p->pid, num);
-        p->trapframe->a0 = -1;
-    }
-}
 
 
 ///////////////////////////////////////////////////////////////////////////////

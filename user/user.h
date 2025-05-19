@@ -43,14 +43,6 @@ void* malloc(uint);
 void free(void*);
 
 
-
-
-
-
-
-
-
-
 //////////
 
 int trace(int);
