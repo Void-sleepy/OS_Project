@@ -126,6 +126,7 @@ static uint64 (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
+[SYS_stats]   sys_stats, // NEW: Added for statistics system call
 };
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -152,10 +153,12 @@ static char *syscall_names[] = {
   [SYS_link]    = "link",
   [SYS_mkdir]   = "mkdir",
   [SYS_close]   = "close",
-
-
   [SYS_trace]   = "trace",
 
+  [SYS_close]   = "close",
+  [SYS_trace]   = "trace",
+  [SYS_lseek]   = "lseek",
+  [SYS_stats]   = "stats", // NEW: Added for statistics system call
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -189,70 +192,64 @@ syscall(void)
 
 */
 
-////////////////[New sys call  the "cooler one" ]////////////////////////////////////////////
+////////////////[New sys call  the "coooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooler one" ]////////////////////////////////////////////
 
-void syscall(void)
-{
-  int num;
-  struct proc *p = myproc();
-
-  num = p->trapframe->a7;
-  if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    // Call the system call and get return value
-    uint64 ret = syscalls[num]();
-    p->trapframe->a0 = ret;
-
-    // If tracing is enabled for this system call
-    if(p->trace_mask & (1 << num)) {
-      print_syscall(p, num, ret);
+// NEW: System call to print statistics
+uint64 sys_stats(void) {
+    for (int i = 0; i < NELEM(syscall_names); i++) {
+        if (syscall_counts[i] && syscall_names[i]) {
+            printf("%s: %ld calls\n", syscall_names[i], syscall_counts[i]);
+        }
     }
-  } else {
-    printf("%d: unknown sys call %d\n", p->pid, num);
-    p->trapframe->a0 = -1;
-  }
+    return 0;
 }
 
 
+void syscall(void)
+{
+    int num;
+    struct proc *p = myproc();
+    num = p->trapframe->a7;
+    if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+        uint64 ret = syscalls[num]();
+        p->trapframe->a0 = ret;
+        if(p->trace_mask & (1 << num)) {
+            print_syscall(p, num, ret);
+        }
+    } else {
+        printf("%d: unknown sys call %d\n", p->pid, num);
+        p->trapframe->a0 = -1;
+    }
+}
+
 ///////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// Rread Null string from user "emty"
+// Read null-terminated string from user space
 int read_string(struct proc *p, uint64 addr, char *buf, int max) {
   
   if(addr >= p->sz)
   {
     return -1; }
-
   int n = 0;
-
   while(n < max) {
     if(copyin(p->pagetable, buf + n, addr + n, 1) == -1) {
-      
       break;
     }
-
     if(buf[n] == '\0'){
       break;
     }
-
     n++;
   }
-
   if(n < max){
-
     buf[n] = '\0';
-
   } else {
-
     buf[max-1] = '\0';
-
   } 
-
   return n;
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
+// Read arbitrary memory from user space
 int read_memory(struct proc *p, uint64 addr, char *buf, int n) {
 
   if(addr >= p->sz || addr + n > p->sz)
@@ -268,78 +265,79 @@ int read_memory(struct proc *p, uint64 addr, char *buf, int n) {
 //////////////////////////////////////////////////////////////
 
 
-void print_syscall(struct proc *p, int num, uint64 ret)
-{
-  printf("%d: %s(", p->pid, syscall_names[num]);
-  
-  switch(num) {
-  case SYS_open:
-    {
-      // For open, decode the filename from a0 (first argument)
-      char filename[64];
-      if(read_string(p, p->trapframe->a0, filename, sizeof(filename)) >= 0) {
-        printf("\"%s\"", filename);
-      } else {
-        printf("0x%lx", p->trapframe->a0);
-      }
-      // Second argument is flags (mode)
-      printf(", %ld", p->trapframe->a1);
-    }
-    break;
-  case SYS_read:
-    {
-      // For read, show fd, buffer address, and size before the call
-      printf("%ld, 0x%lx, %ld", p->trapframe->a0, p->trapframe->a1, p->trapframe->a2);  // Fixed format specifiers      
-      // After the call, if successful, try to display buffer contents
-      if((int)ret > 0 && (int)ret <= 32) { // Limit to 32 bytes
-        char buf[33]; // +1 for null terminator
-        if(read_memory(p, p->trapframe->a1, buf, ret) >= 0) {
-          buf[ret] = '\0'; // Null terminate
-          
-          // Check if it's a printable string
-          int is_string = 1;
-          for(int i = 0; i < ret; i++) {
-            if(buf[i] < 32 || buf[i] > 126) {
-              is_string = 0;
-              break;
-            }
-          }
-          
-          if(is_string) {
-            printf(" → \"%s\"", buf);
-          }
+// Print system call details (enhanced for open's mode)
+void print_syscall(struct proc *p, int num, uint64 ret) {
+    printf("%d: %s(", p->pid, syscall_names[num]);
+    switch (num) {
+    case SYS_open: {
+        char filename[64];
+        if (read_string(p, p->trapframe->a0, filename, sizeof(filename)) >= 0) {
+            printf("\"%s\"", filename);
+        } else {
+            printf("0x%lx", p->trapframe->a0);
         }
-      }
+        printf(", %ld, 0%o", p->trapframe->a1, p->trapframe->a2); // CHANGED: Added mode
+        break;
     }
-    break;
-  case SYS_write:
-    {
-      // For write, show fd, buffer contents, and size
-      printf("%ld, ", p->trapframe->a0); // File descriptor
-      
-      char buf[33]; // Up to 32 bytes + null terminator
-      int n = p->trapframe->a2 > 32 ? 32 : p->trapframe->a2;
-      
-      if(read_memory(p, p->trapframe->a1, buf, n) >= 0) {
-        buf[n] = '\0'; // Null terminate
-        printf("\"%s\"", buf);
-        if(n < p->trapframe->a2)
-          printf("...");
-      } else {
-        printf("0x%lx", p->trapframe->a1);
-      }
-      
-      printf(", %ld", p->trapframe->a2); // Size
+    case SYS_read: {
+        printf("%ld, 0x%lx, %ld", p->trapframe->a0, p->trapframe->a1, p->trapframe->a2);
+        if ((int)ret > 0 && (int)ret <= 32) {
+            char buf[33];
+            if (read_memory(p, p->trapframe->a1, buf, ret) >= 0) {
+                buf[ret] = '\0';
+                int is_string = 1;
+                for (int i = 0; i < ret; i++) {
+                    if (buf[i] < 32 || buf[i] > 126) {
+                        is_string = 0;
+                        break;
+                    }
+                }
+                if (is_string) printf(" → \"%s\"", buf);
+                else printf(" → 0x%lx", p->trapframe->a1); // CHANGED: Added fallback
+            } else {
+                printf(" → 0x%lx", p->trapframe->a1); // CHANGED: Added fallback
+            }
+        }
+        break;
     }
-    break;
-  default:
-    // For other system calls, just print the call name 
-    break;
-  }
-  
-  printf(") → %ld\n", ret);
+    case SYS_write: {
+        printf("%ld, ", p->trapframe->a0);
+        char buf[33];
+        int n = p->trapframe->a2 > 32 ? 32 : p->trapframe->a2;
+        if (read_memory(p, p->trapframe->a1, buf, n) >= 0) {
+            buf[n] = '\0';
+            printf("\"%s\"", buf);
+            if (n < p->trapframe->a2) printf("...");
+        } else {
+            printf("0x%lx", p->trapframe->a1);
+        }
+        printf(", %ld", p->trapframe->a2);
+        break;
+    }
+    default:
+        break;
+    }
+    printf(") = %ld\n", ret); // CHANGED: Aligned with strace format
 }
 
+
+// System call dispatcher with statistics
+void syscall(void) {
+    int num;
+    struct proc *p = myproc();
+    num = p->trapframe->a7;
+    if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+        syscall_counts[num]++; // NEW: Increment counter
+        uint64 ret = syscalls[num]();
+        p->trapframe->a0 = ret;
+        if (p->trace_mask & (1 << num)) {
+            print_syscall(p, num, ret);
+        }
+    } else {
+        printf("%d: unknown sys call %d\n", p->pid, num);
+        p->trapframe->a0 = -1;
+    }
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
