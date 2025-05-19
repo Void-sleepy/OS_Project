@@ -134,10 +134,7 @@ static uint64 (*syscalls[])(void) = {
 };
 
 //////////////////////////////////////////////////////////////////////////////////////
-extern uint64 syscall_counts[];
-extern char *syscall_names[];
 
-uint64 syscall_counts[64] = {0};
 
 ///////////////////////////////////////////////////////////////
 static char *syscall_names[] = {
@@ -168,6 +165,9 @@ static char *syscall_names[] = {
   [SYS_lseek]   = "lseek",
   [SYS_stat]   = "stats", // NEW: Added for statistics system call
 };
+
+
+uint64 syscall_counts[64] = {0};
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
