@@ -116,7 +116,7 @@ uint64 sys_stats(void) {
   int i;
   for(i = 1; i < NSYSCALL; i++) {
     if(syscall_names[i])
-      printf("%s: %ld\n", syscall_names[i], syscall_counts[i]);
+      printf("%s: %ld\n", syscall_names[i], (int)syscall_counts[i]);
   }
   return 0;
 }

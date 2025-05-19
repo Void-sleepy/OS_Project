@@ -134,9 +134,14 @@ static uint64 (*syscalls[])(void) = {
 };
 
 //////////////////////////////////////////////////////////////////////////////////////
+extern uint64 syscall_counts[];
+extern char *syscall_names[];
+
+uint64 syscall_counts[64] = {0};
 
 ///////////////////////////////////////////////////////////////
 static char *syscall_names[] = {
+  [0]          "unused",
   [SYS_fork]    = "fork",
   [SYS_exit]    = "exit",
   [SYS_wait]    = "wait",
@@ -172,8 +177,6 @@ int read_memory(struct proc *p, uint64 addr, char *buf, int n);
 void print_syscall(struct proc *p, int num, uint64 ret);
 //[                                                                    ]//
  // static uint64 syscall_counts[NELEM(syscall_names)];
-
-uint64 syscall_counts[64] = {0};
 
 ////////////[OLD SYS CALL ]/////////////////////////////////////////////////////
 /*
