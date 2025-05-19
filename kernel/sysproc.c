@@ -97,8 +97,7 @@ sys_uptime(void)
 
 /////////////////////////////////////////////////////////////
 
-extern uint64 syscall_counts[];
-extern char* syscall_names[];
+
 extern int NELEM(void*);
 
 uint64 sys_trace(void) {
@@ -115,7 +114,7 @@ uint64 sys_trace(void) {
 
 uint64 sys_stats(void) {
   int i;
-  for(i = 1; i < NELEM(syscall_names); i++) {
+  for(i = 1; i < NSYSCALL; i++) {
     if(syscall_names[i])
       printf("%s: %ld\n", syscall_names[i], syscall_counts[i]);
   }
