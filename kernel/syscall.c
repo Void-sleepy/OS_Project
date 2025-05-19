@@ -128,8 +128,8 @@ static uint64 (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_stat]   sys_fstat, // NEW: Added for statistics system call
-[SYS_trace] sys_trace,
-[SYS_stats] sys_stats,
+[SYS_trace] SYS_trace,
+[SYS_stats] SYS_stats,
 };
 
 //////////////////////////////////////////////////////////////////////////////////////
