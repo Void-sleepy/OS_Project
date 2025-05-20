@@ -3,10 +3,6 @@ struct stat;
 
 
 // system calls
-
-int trace(int);
-int stats(void);
-
 int fork(void);
 int exit(int) __attribute__((noreturn));
 int wait(int*);
@@ -52,3 +48,4 @@ void free(void*);
 //////////
 
 int trace(int);
+int stats(void);

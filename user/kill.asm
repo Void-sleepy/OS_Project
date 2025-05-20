@@ -700,22 +700,22 @@ uptime:
 ///////
 .global trace
 trace:
-  li a7, SYS_trace
+ li a7, SYS_trace
  35e:	03300893          	li	a7,51
-  ecall
+ ecall
  362:	00000073          	ecall
-  ret
+ ret
  366:	8082                	ret
 
 0000000000000368 <stats>:
 
 .global stats
 stats:
-  li a7, SYS_stats
+ li a7, SYS_stats
  368:	03400893          	li	a7,52
-  ecall
+ ecall
  36c:	00000073          	ecall
-  ret
+ ret
  370:	8082                	ret
 
 0000000000000372 <putc>:

@@ -8819,22 +8819,22 @@ uptime:
 ///////
 .global trace
 trace:
-  li a7, SYS_trace
+ li a7, SYS_trace
     4b20:	03300893          	li	a7,51
-  ecall
+ ecall
     4b24:	00000073          	ecall
-  ret
+ ret
     4b28:	8082                	ret
 
 0000000000004b2a <stats>:
 
 .global stats
 stats:
-  li a7, SYS_stats
+ li a7, SYS_stats
     4b2a:	03400893          	li	a7,52
-  ecall
+ ecall
     4b2e:	00000073          	ecall
-  ret
+ ret
     4b32:	8082                	ret
 
 0000000000004b34 <putc>:

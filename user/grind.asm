@@ -1741,22 +1741,22 @@ uptime:
 ///////
 .global trace
 trace:
-  li a7, SYS_trace
+ li a7, SYS_trace
      bee:	03300893          	li	a7,51
-  ecall
+ ecall
      bf2:	00000073          	ecall
-  ret
+ ret
      bf6:	8082                	ret
 
 0000000000000bf8 <stats>:
 
 .global stats
 stats:
-  li a7, SYS_stats
+ li a7, SYS_stats
      bf8:	03400893          	li	a7,52
-  ecall
+ ecall
      bfc:	00000073          	ecall
-  ret
+ ret
      c00:	8082                	ret
 
 0000000000000c02 <putc>:

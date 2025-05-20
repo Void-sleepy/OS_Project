@@ -786,20 +786,20 @@ uptime:
 ///////
 .global trace
 trace:
-  li a7, SYS_trace
+ li a7, SYS_trace
  3e0:	03300893          	li	a7,51
-  ecall
+ ecall
  3e4:	00000073          	ecall
-  ret
+ ret
  3e8:	8082                	ret
 
 00000000000003ea <stats>:
 
 .global stats
 stats:
-  li a7, SYS_stats
+ li a7, SYS_stats
  3ea:	03400893          	li	a7,52
-  ecall
+ ecall
  3ee:	00000073          	ecall
-  ret
+ ret
  3f2:	8082                	ret

@@ -195,7 +195,10 @@ UPROGS=\
 	$U/_wc\
 	$U/_zombie\
 	$U/_gdblab\
-	$U/_project_test1\
+	$U/_tracetest\
+	$U/_statstest\
+	
+	      
 
 
 

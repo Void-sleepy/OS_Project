@@ -108,12 +108,12 @@ uptime:
 ///////
 .global trace
 trace:
-  li a7, SYS_trace
-  ecall
-  ret
+ li a7, SYS_trace
+ ecall
+ ret
 
 .global stats
 stats:
-  li a7, SYS_stats
-  ecall
-  ret
+ li a7, SYS_stats
+ ecall
+ ret
