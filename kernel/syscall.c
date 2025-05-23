@@ -106,7 +106,7 @@ extern uint64 sys_trace(void);
 extern uint64 sys_stats(void);
 
 extern uint64 sys_socket(void);
-extern uint64 sys_gettimeofday(void);
+extern uint64 sys_gettime(void);
 extern uint64 sys_mmap(void);
 
 // An array mapping syscall numbers from syscall.h
@@ -132,13 +132,12 @@ static uint64 (*syscalls[])(void) = {
 [SYS_unlink]      sys_unlink,
 [SYS_link]        sys_link,
 [SYS_mkdir]       sys_mkdir,
-[SYS_close]       sys_close,   
+[SYS_close]       sys_close,
 [SYS_trace]       sys_trace,
 [SYS_stats]       sys_stats,
 [SYS_socket]      sys_socket,
-[SYS_gettime] SYS_gettime,
+[SYS_gettime]     sys_gettime,
 [SYS_mmap]        sys_mmap,
-
 };
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -205,12 +204,20 @@ static char argtypes[][3] = {
 };
 
 
-uint64 syscall_counts[64] = {0};
+
+
+
+uint64 sys_gettime(void) {
+  uint64 tv_addr, tz_addr;
+  argaddr(0, &tv_addr);
+  argaddr(1, &tz_addr);
+  return -1;
+}
 
 uint64 sys_stats(void) {
-  for (int i = 0; i < NSYSCALL; i++) {
+  for (int i = 0; i < NELEM(syscalls); i++) {
     if (syscall_counts[i] > 0) {
-      printf("%s: %ld calls\n", syscall_names[i] ? syscall_names[i] : "unknown", syscall_counts[i]);
+      printf("%s: %d calls\n", syscall_names[i] ? syscall_names[i] : "unknown", syscall_counts[i]);
     }
   }
   return 0;
@@ -224,12 +231,7 @@ uint64 sys_socket(void) {
   return -1;
 }
 
-uint64 sys_gettimeofday(void) {
-  uint64 tv_addr, tz_addr;
-  argaddr(0, &tv_addr);
-  argaddr(1, &tz_addr);
-  return -1;
-}
+
 
 uint64 sys_mmap(void) {
   uint64 addr;
@@ -285,11 +287,13 @@ void syscall(void) {
   if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     uint64 args[MAXARG];
     for (int i = 0; i < MAXARG; i++) {
-      args[i] = p->trapframe->a0 + i * sizeof(uint64);
+      args[i] = argraw(i);
     }
     uint64 ret = syscalls[num]();
     p->trapframe->a0 = ret;
-    print_syscall(p, num, args, ret);  // Add this line
+    if (p->trace_mask & (1 << num)) {
+      print_syscall(p, num, args, ret);
+    }
   } else {
     printf("unknown syscall %d\n", num);
     p->trapframe->a0 = -1;
