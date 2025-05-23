@@ -102,15 +102,15 @@ exec(char *path, char **argv)
   ustack[argc] = 0;
 
   // Check for --trace-mask and set the trace mask
-  for (int i = 0; i < argc; i++) {
-    if (strncmp(argv[i], "--trace-mask") == 0 && i + 1 < argc) {
-      // Simple string-to-int conversion instead of atoi
-      int mask = 0;
-      char *mask_str = argv[i + 1];
-      while (*mask_str && *mask_str >= '0' && *mask_str <= '9') {
-        mask = mask * 10 + (*mask_str - '0');
-        mask_str++;
-      }
+for (int i = 0; i < argc; i++) {
+  if (strncmp(argv[i], "--trace-mask", 12) == 0 && i + 1 < argc) {  // Added 12 as the length
+    // Simple string-to-int conversion instead of atoi
+    int mask = 0;
+    char *mask_str = argv[i + 1];
+    while (*mask_str && *mask_str >= '0' && *mask_str <= '9') {
+      mask = mask * 10 + (*mask_str - '0');
+      mask_str++;
+    }
       p->trace_mask = mask;
       // Shift remaining arguments to remove --trace-mask and its value
       for (int j = i; j < argc - 2; j++) {

@@ -873,9 +873,9 @@ socket:
  47c:	8082                	ret
 
 000000000000047e <gettimeofday>:
-.global gettimeofday
+.global gettime
 gettimeofday:
- li a7, SYS_gettimeofday
+ li a7, SYS_gettime
  47e:	48e5                	li	a7,25
  ecall
  480:	00000073          	ecall

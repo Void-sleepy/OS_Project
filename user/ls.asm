@@ -973,9 +973,9 @@ socket:
  588:	8082                	ret
 
 000000000000058a <gettimeofday>:
-.global gettimeofday
+.global gettime
 gettimeofday:
- li a7, SYS_gettimeofday
+ li a7, SYS_gettime
  58a:	48e5                	li	a7,25
  ecall
  58c:	00000073          	ecall

@@ -5,21 +5,24 @@ user/_test_socket:     file format elf64-littleriscv
 Disassembly of section .text:
 
 0000000000000000 <main>:
-#include "kernel/types.h"
 #include "kernel/stat.h"
 #include "user/user.h"
+
+
 
 int main(void) {
    0:	1141                	addi	sp,sp,-16
    2:	e406                	sd	ra,8(sp)
    4:	e022                	sd	s0,0(sp)
    6:	0800                	addi	s0,sp,16
+  
   int fd = socket(AF_INET, SOCK_STREAM, 0);
    8:	4601                	li	a2,0
    a:	4585                	li	a1,1
    c:	4509                	li	a0,2
    e:	332000ef          	jal	340 <socket>
   12:	85aa                	mv	a1,a0
+  
   printf("socket returned %d\n", fd);
   14:	00001517          	auipc	a0,0x1
   18:	86c50513          	addi	a0,a0,-1940 # 880 <malloc+0xfc>
@@ -703,9 +706,9 @@ socket:
  346:	8082                	ret
 
 0000000000000348 <gettimeofday>:
-.global gettimeofday
+.global gettime
 gettimeofday:
- li a7, SYS_gettimeofday
+ li a7, SYS_gettime
  348:	48e5                	li	a7,25
  ecall
  34a:	00000073          	ecall

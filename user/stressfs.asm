@@ -785,9 +785,9 @@ socket:
  3f8:	8082                	ret
 
 00000000000003fa <gettimeofday>:
-.global gettimeofday
+.global gettime
 gettimeofday:
- li a7, SYS_gettimeofday
+ li a7, SYS_gettime
  3fa:	48e5                	li	a7,25
  ecall
  3fc:	00000073          	ecall

@@ -8847,9 +8847,9 @@ socket:
     4b36:	8082                	ret
 
 0000000000004b38 <gettimeofday>:
-.global gettimeofday
+.global gettime
 gettimeofday:
- li a7, SYS_gettimeofday
+ li a7, SYS_gettime
     4b38:	48e5                	li	a7,25
  ecall
     4b3a:	00000073          	ecall

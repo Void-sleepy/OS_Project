@@ -780,9 +780,9 @@ socket:
  3dc:	8082                	ret
 
 00000000000003de <gettimeofday>:
-.global gettimeofday
+.global gettime
 gettimeofday:
- li a7, SYS_gettimeofday
+ li a7, SYS_gettime
  3de:	48e5                	li	a7,25
  ecall
  3e0:	00000073          	ecall

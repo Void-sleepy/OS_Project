@@ -121,9 +121,9 @@ socket:
  li a7, SYS_socket
  ecall
  ret
-.global gettimeofday
+.global gettime
 gettimeofday:
- li a7, SYS_gettimeofday
+ li a7, SYS_gettime
  ecall
  ret
 .global mmap

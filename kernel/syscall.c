@@ -305,17 +305,6 @@ void syscall(void) {
 ///////////////////////////////////////////////////////////////
 
 
-
-uint64 sys_trace(void) {
-  struct proc *p = myproc();
-  int mask;
-  argint(0, &mask);  
-  p->trace_mask = mask;
-  return 0;
-}
-
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Read null-terminated string from user space
 int read_string(struct proc *p, uint64 addr, char *buf, int max) {

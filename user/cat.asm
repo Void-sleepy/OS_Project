@@ -811,9 +811,9 @@ socket:
  40a:	8082                	ret
 
 000000000000040c <gettimeofday>:
-.global gettimeofday
+.global gettime
 gettimeofday:
- li a7, SYS_gettimeofday
+ li a7, SYS_gettime
  40c:	48e5                	li	a7,25
  ecall
  40e:	00000073          	ecall

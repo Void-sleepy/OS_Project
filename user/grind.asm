@@ -1769,9 +1769,9 @@ socket:
      c04:	8082                	ret
 
 0000000000000c06 <gettimeofday>:
-.global gettimeofday
+.global gettime
 gettimeofday:
- li a7, SYS_gettimeofday
+ li a7, SYS_gettime
      c06:	48e5                	li	a7,25
  ecall
      c08:	00000073          	ecall

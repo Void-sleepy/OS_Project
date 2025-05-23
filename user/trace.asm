@@ -769,9 +769,9 @@ socket:
  3da:	8082                	ret
 
 00000000000003dc <gettimeofday>:
-.global gettimeofday
+.global gettime
 gettimeofday:
- li a7, SYS_gettimeofday
+ li a7, SYS_gettime
  3dc:	48e5                	li	a7,25
  ecall
  3de:	00000073          	ecall

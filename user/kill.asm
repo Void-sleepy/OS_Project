@@ -728,9 +728,9 @@ socket:
  374:	8082                	ret
 
 0000000000000376 <gettimeofday>:
-.global gettimeofday
+.global gettime
 gettimeofday:
- li a7, SYS_gettimeofday
+ li a7, SYS_gettime
  376:	48e5                	li	a7,25
  ecall
  378:	00000073          	ecall
