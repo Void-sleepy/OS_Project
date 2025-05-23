@@ -177,6 +177,43 @@ static char *syscall_names[] = {
 
 uint64 syscall_counts[64] = {0};
 
+uint64 sys_stats(void) {
+  for (int i = 0; i < NSYSCALL; i++) {
+    if (syscall_counts[i] > 0) {
+      printf("%s: %ld calls\n", syscall_names[i] ? syscall_names[i] : "unknown", syscall_counts[i]);
+    }
+  }
+  return 0;
+}
+
+uint64 sys_socket(void) {
+  int domain, type, protocol;
+  argint(0, &domain);
+  argint(1, &type);
+  argint(2, &protocol);
+  return -1;
+}
+
+uint64 sys_gettimeofday(void) {
+  uint64 tv_addr, tz_addr;
+  argaddr(0, &tv_addr);
+  argaddr(1, &tz_addr);
+  return -1;
+}
+
+uint64 sys_mmap(void) {
+  uint64 addr;
+  int length, prot, flags, fd, offset;
+  argaddr(0, &addr);
+  argint(1, &length);
+  argint(2, &prot);
+  argint(3, &flags);
+  argint(4, &fd);
+  argint(5, &offset);
+  return -1;
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 //[                                                                    ]//
@@ -234,6 +271,19 @@ void syscall(void)
 }
 
 ///////////////////////////////////////////////////////////////
+
+
+
+uint64 sys_trace(void) {
+  struct proc *p = myproc();
+  int mask;
+  argint(0, &mask);  
+  p->trace_mask = mask;
+  return 0;
+}
+
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Read null-terminated string from user space
 int read_string(struct proc *p, uint64 addr, char *buf, int max) {
@@ -329,5 +379,6 @@ void print_syscall(struct proc *p, int num, uint64 ret) {
     }
     printf(") = %ld\n", ret); // CHANGED: Aligned with strace format
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
