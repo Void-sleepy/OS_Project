@@ -45,7 +45,7 @@ forktest(void)
 
   print("fork test\n");
   32:	00000517          	auipc	a0,0x0
-  36:	3c650513          	addi	a0,a0,966 # 3f8 <stats+0xe>
+  36:	3ce50513          	addi	a0,a0,974 # 400 <mmap+0x8>
   3a:	fc7ff0ef          	jal	0 <print>
 
   for(n=0; n<N; n++){
@@ -67,7 +67,7 @@ forktest(void)
   if(n == N){
     print("fork claimed to work N times!\n");
   54:	00000517          	auipc	a0,0x0
-  58:	3f450513          	addi	a0,a0,1012 # 448 <stats+0x5e>
+  58:	3fc50513          	addi	a0,a0,1020 # 450 <mmap+0x58>
   5c:	fa5ff0ef          	jal	0 <print>
     exit(1);
   60:	4505                	li	a0,1
@@ -80,7 +80,7 @@ forktest(void)
     if(wait(0) < 0){
       print("wait stopped early\n");
   6a:	00000517          	auipc	a0,0x0
-  6e:	39e50513          	addi	a0,a0,926 # 408 <stats+0x1e>
+  6e:	3a650513          	addi	a0,a0,934 # 410 <mmap+0x18>
   72:	f8fff0ef          	jal	0 <print>
       exit(1);
   76:	4505                	li	a0,1
@@ -91,7 +91,7 @@ forktest(void)
   if(wait(0) != -1){
     print("wait got too many\n");
   7c:	00000517          	auipc	a0,0x0
-  80:	3a450513          	addi	a0,a0,932 # 420 <stats+0x36>
+  80:	3ac50513          	addi	a0,a0,940 # 428 <mmap+0x30>
   84:	f7dff0ef          	jal	0 <print>
     exit(1);
   88:	4505                	li	a0,1
@@ -114,7 +114,7 @@ forktest(void)
 
   print("fork test OK\n");
   ac:	00000517          	auipc	a0,0x0
-  b0:	38c50513          	addi	a0,a0,908 # 438 <stats+0x4e>
+  b0:	39450513          	addi	a0,a0,916 # 440 <mmap+0x48>
   b4:	f4dff0ef          	jal	0 <print>
 }
   b8:	60e2                	ld	ra,24(sp)
@@ -783,23 +783,41 @@ uptime:
  3de:	8082                	ret
 
 00000000000003e0 <trace>:
-///////
 .global trace
 trace:
  li a7, SYS_trace
- 3e0:	03300893          	li	a7,51
+ 3e0:	48d9                	li	a7,22
  ecall
- 3e4:	00000073          	ecall
+ 3e2:	00000073          	ecall
  ret
- 3e8:	8082                	ret
+ 3e6:	8082                	ret
 
-00000000000003ea <stats>:
-
-.global stats
-stats:
- li a7, SYS_stats
- 3ea:	03400893          	li	a7,52
+00000000000003e8 <socket>:
+.global socket
+socket:
+ li a7, SYS_socket
+ 3e8:	48e1                	li	a7,24
  ecall
- 3ee:	00000073          	ecall
+ 3ea:	00000073          	ecall
  ret
- 3f2:	8082                	ret
+ 3ee:	8082                	ret
+
+00000000000003f0 <gettimeofday>:
+.global gettimeofday
+gettimeofday:
+ li a7, SYS_gettimeofday
+ 3f0:	48e5                	li	a7,25
+ ecall
+ 3f2:	00000073          	ecall
+ ret
+ 3f6:	8082                	ret
+
+00000000000003f8 <mmap>:
+.global mmap
+mmap:
+ li a7, SYS_mmap
+ 3f8:	48e9                	li	a7,26
+ ecall
+ 3fa:	00000073          	ecall
+ ret
+ 3fe:	8082                	ret

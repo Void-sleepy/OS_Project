@@ -755,7 +755,60 @@ procdump(void)
   }
 }
 
+///////////////////////////////////////////////////////
 
+uint64 sys_trace(void) {
+  struct proc *p = myproc();
+  int mask;
+  if (argint(0, &mask) < 0) return -1;
+  p->trace_mask = mask;
+  return 0;
+}
+
+uint64 sys_stats(void) {
+  struct proc *p = myproc();
+  for (int i = 0; i < NSYSCALL; i++) {
+    if (syscall_counts[i] > 0) {
+      printf("%s: %d calls\n", syscall_names[i] ? syscall_names[i] : "unknown", syscall_counts[i]);
+    }
+  }
+  return 0;
+}
+
+uint64 sys_socket(void) {
+  // Placeholder: xv6 doesn't support networking
+  // Arguments: domain (e.g., AF_INET), type (e.g., SOCK_STREAM), protocol
+  int domain, type, protocol;
+  if (argint(0, &domain) < 0 || argint(1, &type) < 0 || argint(2, &protocol) < 0) {
+    return -1;
+  }
+  // For bonus: Recognize the call but return error
+  return -1;  // ENOSYS: Function not implemented
+}
+
+uint64 sys_gettimeofday(void) {
+  // Placeholder: xv6 doesn't have a precise clock for gettimeofday
+  // Arguments: struct timeval *tv, struct timezone *tz
+  uint64 tv_addr, tz_addr;
+  if (argaddr(0, &tv_addr) < 0 || argaddr(1, &tz_addr) < 0) {
+    return -1;
+  }
+  // For bonus: Recognize the call but return error
+  return -1;  // ENOSYS: Function not implemented
+}
+
+uint64 sys_mmap(void) {
+  // Placeholder: xv6 doesn't support memory mapping
+  // Arguments: addr, length, prot, flags, fd, offset
+  uint64 addr;
+  int length, prot, flags, fd, offset;
+  if (argaddr(0, &addr) < 0 || argint(1, &length) < 0 || argint(2, &prot) < 0 ||
+      argint(3, &flags) < 0 || argint(4, &fd) < 0 || argint(5, &offset) < 0) {
+    return -1;
+  }
+  // For bonus: Recognize the call but return error
+  return -1;  // ENOSYS: Function not implemented
+}
 
 
 /////////////////////////////////////////////////////
