@@ -125,3 +125,8 @@ mmap:
  li a7, SYS_mmap
  ecall
  ret
+.global stats
+stats:
+    li a7, SYS_stats
+    ecall
+    ret
