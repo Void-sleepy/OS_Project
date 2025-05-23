@@ -20,7 +20,7 @@ int main(void) {
    8:	4601                	li	a2,0
    a:	4585                	li	a1,1
    c:	4509                	li	a0,2
-   e:	332000ef          	jal	340 <socket>
+   e:	32a000ef          	jal	338 <socket>
   12:	85aa                	mv	a1,a0
   
   printf("socket returned %d\n", fd);
@@ -278,7 +278,7 @@ stat(const char *n, struct stat *st)
 
   fd = open(n, O_RDONLY);
  16c:	4581                	li	a1,0
- 16e:	15a000ef          	jal	2c8 <open>
+ 16e:	162000ef          	jal	2d0 <open>
   if(fd < 0)
  172:	02054263          	bltz	a0,196 <stat+0x36>
  176:	e426                	sd	s1,8(sp)
@@ -286,11 +286,11 @@ stat(const char *n, struct stat *st)
     return -1;
   r = fstat(fd, st);
  17a:	85ca                	mv	a1,s2
- 17c:	164000ef          	jal	2e0 <fstat>
+ 17c:	16c000ef          	jal	2e8 <fstat>
  180:	892a                	mv	s2,a0
   close(fd);
  182:	8526                	mv	a0,s1
- 184:	1a4000ef          	jal	328 <close>
+ 184:	134000ef          	jal	2b8 <close>
   return r;
  188:	64a2                	ld	s1,8(sp)
 }
@@ -524,151 +524,151 @@ write:
  ret
  2b6:	8082                	ret
 
-00000000000002b8 <kill>:
-.global kill
-kill:
- li a7, SYS_kill
- 2b8:	4899                	li	a7,6
+00000000000002b8 <close>:
+.global close
+close:
+ li a7, SYS_close
+ 2b8:	48d5                	li	a7,21
  ecall
  2ba:	00000073          	ecall
  ret
  2be:	8082                	ret
 
-00000000000002c0 <exec>:
-.global exec
-exec:
- li a7, SYS_exec
- 2c0:	489d                	li	a7,7
+00000000000002c0 <kill>:
+.global kill
+kill:
+ li a7, SYS_kill
+ 2c0:	4899                	li	a7,6
  ecall
  2c2:	00000073          	ecall
  ret
  2c6:	8082                	ret
 
-00000000000002c8 <open>:
-.global open
-open:
- li a7, SYS_open
- 2c8:	48bd                	li	a7,15
+00000000000002c8 <exec>:
+.global exec
+exec:
+ li a7, SYS_exec
+ 2c8:	489d                	li	a7,7
  ecall
  2ca:	00000073          	ecall
  ret
  2ce:	8082                	ret
 
-00000000000002d0 <mknod>:
-.global mknod
-mknod:
- li a7, SYS_mknod
- 2d0:	48c5                	li	a7,17
+00000000000002d0 <open>:
+.global open
+open:
+ li a7, SYS_open
+ 2d0:	48bd                	li	a7,15
  ecall
  2d2:	00000073          	ecall
  ret
  2d6:	8082                	ret
 
-00000000000002d8 <unlink>:
-.global unlink
-unlink:
- li a7, SYS_unlink
- 2d8:	48c9                	li	a7,18
+00000000000002d8 <mknod>:
+.global mknod
+mknod:
+ li a7, SYS_mknod
+ 2d8:	48c5                	li	a7,17
  ecall
  2da:	00000073          	ecall
  ret
  2de:	8082                	ret
 
-00000000000002e0 <fstat>:
-.global fstat
-fstat:
- li a7, SYS_fstat
- 2e0:	48a1                	li	a7,8
+00000000000002e0 <unlink>:
+.global unlink
+unlink:
+ li a7, SYS_unlink
+ 2e0:	48c9                	li	a7,18
  ecall
  2e2:	00000073          	ecall
  ret
  2e6:	8082                	ret
 
-00000000000002e8 <link>:
-.global link
-link:
- li a7, SYS_link
- 2e8:	48cd                	li	a7,19
+00000000000002e8 <fstat>:
+.global fstat
+fstat:
+ li a7, SYS_fstat
+ 2e8:	48a1                	li	a7,8
  ecall
  2ea:	00000073          	ecall
  ret
  2ee:	8082                	ret
 
-00000000000002f0 <mkdir>:
-.global mkdir
-mkdir:
- li a7, SYS_mkdir
- 2f0:	48d1                	li	a7,20
+00000000000002f0 <link>:
+.global link
+link:
+ li a7, SYS_link
+ 2f0:	48cd                	li	a7,19
  ecall
  2f2:	00000073          	ecall
  ret
  2f6:	8082                	ret
 
-00000000000002f8 <chdir>:
-.global chdir
-chdir:
- li a7, SYS_chdir
- 2f8:	48a5                	li	a7,9
+00000000000002f8 <mkdir>:
+.global mkdir
+mkdir:
+ li a7, SYS_mkdir
+ 2f8:	48d1                	li	a7,20
  ecall
  2fa:	00000073          	ecall
  ret
  2fe:	8082                	ret
 
-0000000000000300 <dup>:
-.global dup
-dup:
- li a7, SYS_dup
- 300:	48a9                	li	a7,10
+0000000000000300 <chdir>:
+.global chdir
+chdir:
+ li a7, SYS_chdir
+ 300:	48a5                	li	a7,9
  ecall
  302:	00000073          	ecall
  ret
  306:	8082                	ret
 
-0000000000000308 <getpid>:
-.global getpid
-getpid:
- li a7, SYS_getpid
- 308:	48ad                	li	a7,11
+0000000000000308 <dup>:
+.global dup
+dup:
+ li a7, SYS_dup
+ 308:	48a9                	li	a7,10
  ecall
  30a:	00000073          	ecall
  ret
  30e:	8082                	ret
 
-0000000000000310 <sbrk>:
-.global sbrk
-sbrk:
- li a7, SYS_sbrk
- 310:	48b1                	li	a7,12
+0000000000000310 <getpid>:
+.global getpid
+getpid:
+ li a7, SYS_getpid
+ 310:	48ad                	li	a7,11
  ecall
  312:	00000073          	ecall
  ret
  316:	8082                	ret
 
-0000000000000318 <sleep>:
-.global sleep
-sleep:
- li a7, SYS_sleep
- 318:	48b5                	li	a7,13
+0000000000000318 <sbrk>:
+.global sbrk
+sbrk:
+ li a7, SYS_sbrk
+ 318:	48b1                	li	a7,12
  ecall
  31a:	00000073          	ecall
  ret
  31e:	8082                	ret
 
-0000000000000320 <uptime>:
-.global uptime
-uptime:
- li a7, SYS_uptime
- 320:	48b9                	li	a7,14
+0000000000000320 <sleep>:
+.global sleep
+sleep:
+ li a7, SYS_sleep
+ 320:	48b5                	li	a7,13
  ecall
  322:	00000073          	ecall
  ret
  326:	8082                	ret
 
-0000000000000328 <close>:
-.global close
-close:
- li a7, SYS_close
- 328:	48d5                	li	a7,21
+0000000000000328 <uptime>:
+.global uptime
+uptime:
+ li a7, SYS_uptime
+ 328:	48b9                	li	a7,14
  ecall
  32a:	00000073          	ecall
  ret
@@ -684,45 +684,44 @@ trace:
  ret
  336:	8082                	ret
 
-0000000000000338 <stats>:
-.global stats
-stats:
- li a7, SYS_stats
- 338:	48dd                	li	a7,23
+0000000000000338 <socket>:
+.global socket
+socket:
+ li a7, SYS_socket
+ 338:	48e1                	li	a7,24
  ecall
  33a:	00000073          	ecall
  ret
  33e:	8082                	ret
 
-0000000000000340 <socket>:
- 
-.global socket
-socket:
- li a7, SYS_socket
- 340:	48e1                	li	a7,24
+0000000000000340 <gettime>:
+.global gettime
+gettime:
+ li a7, SYS_gettime
+ 340:	48e5                	li	a7,25
  ecall
  342:	00000073          	ecall
  ret
  346:	8082                	ret
 
-0000000000000348 <gettimeofday>:
-.global gettime
-gettimeofday:
- li a7, SYS_gettime
- 348:	48e5                	li	a7,25
+0000000000000348 <mmap>:
+.global mmap
+mmap:
+ li a7, SYS_mmap
+ 348:	48e9                	li	a7,26
  ecall
  34a:	00000073          	ecall
  ret
  34e:	8082                	ret
 
-0000000000000350 <mmap>:
-.global mmap
-mmap:
- li a7, SYS_mmap
- 350:	48e9                	li	a7,26
- ecall
+0000000000000350 <stats>:
+.global stats
+stats:
+    li a7, SYS_stats
+ 350:	48dd                	li	a7,23
+    ecall
  352:	00000073          	ecall
- ret
+    ret
  356:	8082                	ret
 
 0000000000000358 <putc>:
@@ -1439,7 +1438,7 @@ malloc(uint nbytes)
  820:	fef719e3          	bne	a4,a5,812 <malloc+0x8e>
   p = sbrk(nu * sizeof(Header));
  824:	8552                	mv	a0,s4
- 826:	aebff0ef          	jal	310 <sbrk>
+ 826:	af3ff0ef          	jal	318 <sbrk>
   if(p == (char*)-1)
  82a:	fd551ce3          	bne	a0,s5,802 <malloc+0x7e>
         return 0;

@@ -78,5 +78,5 @@ struct timezone {
 #define SOCK_DGRAM  2   // UDP
 
 int socket(int domain, int type, int protocol);
-int gettimeofday(struct timeval *tv, struct timezone *tz);
+int gettime(struct timeval *tv, struct timezone *tz);
 void* mmap(void *addr, int length, int prot, int flags, int fd, int offset);
