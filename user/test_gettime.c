@@ -5,7 +5,7 @@
 int main(void) {
   struct timeval tv;
   struct timezone tz;
-  int ret = gettimeofday(&tv, &tz);
+  int ret = gettime(&tv, &tz);
   printf("gettimeofday returned %d\n", ret);
   exit(0);
 }

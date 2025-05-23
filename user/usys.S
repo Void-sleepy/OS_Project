@@ -30,6 +30,11 @@ write:
  li a7, SYS_write
  ecall
  ret
+.global close
+close:
+ li a7, SYS_close
+ ecall
+ ret
 .global kill
 kill:
  li a7, SYS_kill
@@ -100,29 +105,18 @@ uptime:
  li a7, SYS_uptime
  ecall
  ret
-.global close
-close:
- li a7, SYS_close
- ecall
- ret
 .global trace
 trace:
  li a7, SYS_trace
  ecall
  ret
-.global stats
-stats:
- li a7, SYS_stats
- ecall
- ret
- 
 .global socket
 socket:
  li a7, SYS_socket
  ecall
  ret
 .global gettime
-gettimeofday:
+gettime:
  li a7, SYS_gettime
  ecall
  ret

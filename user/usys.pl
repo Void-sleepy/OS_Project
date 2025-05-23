@@ -43,5 +43,5 @@ entry("uptime");
 entry("trace");
 
 entry("socket");
-entry("gettimeofday");
+entry("gettime");
 entry("mmap");
