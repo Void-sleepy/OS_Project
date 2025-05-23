@@ -26,9 +26,9 @@
 
 #define SYS_trace  22
 #define SYS_stats  23
-#define SYS_socket      24
-#define SYS_gettimeofday 25
-#define SYS_mmap        26
+#define SYS_socket   24
+#define SYS_gettime 25
+#define SYS_mmap     26
 
 #define NSYSCALL 27
 

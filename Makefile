@@ -196,11 +196,9 @@ UPROGS=\
 	$U/_gdblab\
 	$U/_stats\
 	$U/_trace\
-	$U/_timeDAY\
-	$u/_testSocket\
-	$U/_testmmap\
-
-
+	$U/_test_socket\
+	$U/_test_gettime\
+	$U/_test_mmap\
 
 
 ifeq ($(LAB),syscall)

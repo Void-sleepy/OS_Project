@@ -136,7 +136,7 @@ static uint64 (*syscalls[])(void) = {
 [SYS_trace]       sys_trace,
 [SYS_stats]       sys_stats,
 [SYS_socket]      sys_socket,
-[SYS_gettimeofday] sys_gettimeofday,
+[SYS_gettime] SYS_gettime,
 [SYS_mmap]        sys_mmap,
 
 };
@@ -145,33 +145,63 @@ static uint64 (*syscalls[])(void) = {
 
 ///////////////////////////////////////////////////////////////
 static char *syscall_names[] = {
-  [0]               = "unused",
-  [SYS_fork]        = "fork",           // 1
-  [SYS_exit]        = "exit",           // 2
-  [SYS_wait]        = "wait",           // 3
-  [SYS_pipe]        = "pipe",           // 4
-  [SYS_read]        = "read",           // 5
-  [SYS_kill]        = "kill",           // 6
-  [SYS_exec]        = "exec",           // 7
-  [SYS_fstat]       = "fstat",          // 8
-  [SYS_chdir]       = "chdir",          // 9
-  [SYS_dup]         = "dup",            // 10
-  [SYS_getpid]      = "getpid",         // 11
-  [SYS_sbrk]        = "sbrk",           // 12
-  [SYS_sleep]       = "sleep",          // 13
-  [SYS_uptime]      = "uptime",         // 14
-  [SYS_open]        = "open",           // 15
-  [SYS_write]       = "write",          // 16
-  [SYS_mknod]       = "mknod",          // 17
-  [SYS_unlink]      = "unlink",         // 18
-  [SYS_link]        = "link",           // 19
-  [SYS_mkdir]       = "mkdir",          // 20
-  [SYS_close]       = "close",          // 21
-  [SYS_trace]       = "trace",          // 22
-  [SYS_stats]       = "stats",          // 23
-  [SYS_socket]      = "socket",         // 24
-  [SYS_gettimeofday] = "gettimeofday",  // 25
-  [SYS_mmap]        = "mmap",           // 26
+  [SYS_fork]    "fork",
+  [SYS_exit]    "exit",
+  [SYS_wait]    "wait",
+  [SYS_pipe]    "pipe",
+  [SYS_read]    "read",
+  [SYS_kill]    "kill",
+  [SYS_exec]    "exec",
+  [SYS_fstat]   "fstat",
+  [SYS_chdir]   "chdir",
+  [SYS_dup]     "dup",
+  [SYS_getpid]  "getpid",
+  [SYS_sbrk]    "sbrk",
+  [SYS_sleep]   "sleep",
+  [SYS_uptime]  "uptime",
+  [SYS_open]    "open",
+  [SYS_write]   "write",
+  [SYS_mknod]   "mknod",
+  [SYS_unlink]  "unlink",
+  [SYS_link]    "link",
+  [SYS_mkdir]   "mkdir",
+  [SYS_close]   "close",
+  [SYS_trace]   "trace",      // Your added system calls
+  [SYS_stats]   "stats",
+  [SYS_socket]  "socket",
+  [SYS_gettime] "gettime",
+  [SYS_mmap]    "mmap",
+};
+
+
+// argument types: 'i' for integer, 'a' for address, 0 for none    [waaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ]
+static char argtypes[][3] = {
+  [SYS_fork]    {0, 0, 0},
+  [SYS_exit]    {'i', 0, 0},
+  [SYS_wait]    {0, 0, 0},
+  [SYS_pipe]    {'a', 0, 0},
+  [SYS_read]    {'i', 'a', 'i'},
+  [SYS_kill]    {'i', 0, 0},
+  [SYS_exec]    {'a', 'a', 0},
+  [SYS_fstat]   {'i', 'a', 0},
+  [SYS_chdir]   {'a', 0, 0},
+  [SYS_dup]     {'i', 0, 0},
+  [SYS_getpid]  {0, 0, 0},
+  [SYS_sbrk]    {'i', 0, 0},
+  [SYS_sleep]   {'i', 0, 0},
+  [SYS_uptime]  {0, 0, 0},
+  [SYS_open]    {'a', 'i', 'i'},
+  [SYS_write]   {'i', 'a', 'i'},
+  [SYS_mknod]   {'a', 'i', 'i'},
+  [SYS_unlink]  {'a', 0, 0},
+  [SYS_link]    {'a', 'a', 0},
+  [SYS_mkdir]   {'a', 0, 0},
+  [SYS_close]   {'i', 0, 0},
+  [SYS_trace]   {'i', 0, 0},
+  [SYS_stats]   {0, 0, 0},
+  [SYS_socket]  {'i', 'i', 'i'},
+  [SYS_gettime] {'a', 'a', 0},
+  [SYS_mmap]    {'a', 'i', 'i'},
 };
 
 
@@ -219,10 +249,12 @@ uint64 sys_mmap(void) {
 //[                                                                    ]//
 int read_string(struct proc *p, uint64 addr, char *buf, int max);
 int read_memory(struct proc *p, uint64 addr, char *buf, int n);
-void print_syscall(struct proc *p, int num, uint64 ret);
-//[                                                                    ]//
- // static uint64 syscall_counts[NELEM(syscall_names)];
+void print_syscall(struct proc *p, int num, uint64 args[], uint64 ret);
 
+//[                                                                    ]//
+
+
+static int syscall_counts[NELEM(syscalls)] = {0};
 ////////////[OLD SYS CALL ]/////////////////////////////////////////////////////
 /*
 void
@@ -247,25 +279,19 @@ syscall(void)
 
 ////////////////[New sys call  the "coooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooler one" ]////////////////////////////////////////////
 // System call dispatcher with statistics
-void syscall(void)
-{
-  int num;
+void syscall(void) {
   struct proc *p = myproc();
-
-  num = p->trapframe->a7;
-  if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    // Save the system call number
-    p->trapframe->a0 = syscalls[num]();
-
-    // Increment the count for this system call
-    syscall_counts[num]++;
-
-    // If process is being traced and the mask includes this syscall
-    if(p->trace_mask & (1 << num)) {
-      print_syscall(p, num, p->trapframe->a0);
+  int num = p->trapframe->a7;
+  if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+    uint64 args[MAXARG];
+    for (int i = 0; i < MAXARG; i++) {
+      args[i] = p->trapframe->a0 + i * sizeof(uint64);
     }
+    uint64 ret = syscalls[num]();
+    p->trapframe->a0 = ret;
+    print_syscall(p, num, args, ret);  // Add this line
   } else {
-    printf("%d %s: unknown sys call %d\n", p->pid, p->name, num);
+    printf("unknown syscall %d\n", num);
     p->trapframe->a0 = -1;
   }
 }
@@ -326,59 +352,17 @@ int read_memory(struct proc *p, uint64 addr, char *buf, int n) {
 
 
 // Print system call details (enhanced for open's mode)
-void print_syscall(struct proc *p, int num, uint64 ret) {
-    printf("%d: %s(", p->pid, syscall_names[num]);
-    switch (num) {
-    case SYS_open: {
-        char filename[64];
-        if (read_string(p, p->trapframe->a0, filename, sizeof(filename)) >= 0) {
-            printf("\"%s\"", filename);
-        } else {
-            printf("0x%lx", p->trapframe->a0);
-        }
-        printf(", %ld, 0%lo", p->trapframe->a1, p->trapframe->a2); // CHANGED: Added mode
-        break;
+void print_syscall(struct proc *p, int num, uint64 args[], uint64 ret) {
+  if (p->trace_mask & (1 << num)) {
+    printf("1: %s(", syscall_names[num] ? syscall_names[num] : "unknown");
+    for (int i = 0; i < 3 && argtypes[num][i]; i++) {
+      if (i > 0) printf(", ");
+      if (argtypes[num][i] == 'i') printf("%d", (int)args[i]);
+      else if (argtypes[num][i] == 'a') printf("0x%lx", args[i]);
+      else printf("?");
     }
-    case SYS_read: {
-        printf("%ld, 0x%lx, %ld", p->trapframe->a0, p->trapframe->a1, p->trapframe->a2);
-        if ((int)ret > 0 && (int)ret <= 32) {
-            char buf[33];
-            if (read_memory(p, p->trapframe->a1, buf, ret) >= 0) {
-                buf[ret] = '\0';
-                int is_string = 1;
-                for (int i = 0; i < ret; i++) {
-                    if (buf[i] < 32 || buf[i] > 126) {
-                        is_string = 0;
-                        break;
-                    }
-                }
-                if (is_string) printf(" → \"%s\"", buf);
-                else printf(" → 0x%lx", p->trapframe->a1); // CHANGED: Added fallback
-            } else {
-                printf(" → 0x%lx", p->trapframe->a1); // CHANGED: Added fallback
-            }
-        }
-        break;
-    }
-    case SYS_write: {
-        printf("%ld, ", p->trapframe->a0);
-        char buf[33];
-        int n = p->trapframe->a2 > 32 ? 32 : p->trapframe->a2;
-        if (read_memory(p, p->trapframe->a1, buf, n) >= 0) {
-            buf[n] = '\0';
-            printf("\"%s\"", buf);
-            if (n < p->trapframe->a2) printf("...");
-        } else {
-            printf("0x%lx", p->trapframe->a1);
-        }
-        printf(", %ld", p->trapframe->a2);
-        break;
-    }
-    default:
-        break;
-    }
-    printf(") = %ld\n", ret); // CHANGED: Aligned with strace format
+    printf(") = %ld\n", ret);
+  }
+  syscall_counts[num]++;
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
