@@ -31,33 +31,34 @@ fetchstr(uint64 addr, char *buf, int max)
   return strlen(buf);
 }
 
-static uint64
-argraw(int n)
+static void
+argraw(int n, uint64 *ip)
 {
   struct proc *p = myproc();
-  switch (n) {
-  case 0:
-    return p->trapframe->a0;
-  case 1:
-    return p->trapframe->a1;
-  case 2:
-    return p->trapframe->a2;
-  case 3:
-    return p->trapframe->a3;
-  case 4:
-    return p->trapframe->a4;
-  case 5:
-    return p->trapframe->a5;
+  printf("argraw: n=%d, proc=%p, trapframe=%p\n", n, p, p ? p->trapframe : 0);
+  if (p == 0 || p->trapframe == 0) {
+    panic("argraw: invalid proc or trapframe");
   }
-  panic("argraw");
-  return -1;
+  if (n < 0 || n > 5) {
+    panic("argraw: invalid n");
+  }
+  switch (n) {
+    case 0: *ip = p->trapframe->a0; break;
+    case 1: *ip = p->trapframe->a1; break;
+    case 2: *ip = p->trapframe->a2; break;
+    case 3: *ip = p->trapframe->a3; break;
+    case 4: *ip = p->trapframe->a4; break;
+    case 5: *ip = p->trapframe->a5; break;
+  }
 }
 
 // Fetch the nth 32-bit system call argument.
 void
 argint(int n, int *ip)
 {
-  *ip = argraw(n);
+  uint64 val;
+  argraw(n, &val);
+  *ip = (int)val;
 }
 
 // Retrieve an argument as a pointer.
@@ -66,7 +67,7 @@ argint(int n, int *ip)
 void
 argaddr(int n, uint64 *ip)
 {
-  *ip = argraw(n);
+    argraw(n, ip);
 }
 
 // Fetch the nth word-sized system call argument as a null-terminated string.
@@ -283,22 +284,16 @@ syscall(void)
 
 ////////////////[New sys call  the "coooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooler one" ]////////////////////////////////////////////
 // System call dispatcher with statistics
-void syscall(void) {
-  struct proc *p = myproc();
-  int num = p->trapframe->a7;
-  if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    uint64 args[MAXARG];
-    for (int i = 0; i < MAXARG; i++) {
-      args[i] = argraw(i);
-    }
-    uint64 ret = syscalls[num]();
-    p->trapframe->a0 = ret;
-    if (p->trace_mask & (1 << num)) {
-      print_syscall(p, num, args, ret);
-    }
+void
+syscall(void)
+{
+  int num = myproc()->trapframe->a7;
+  printf("syscall: num=%d\n", num);
+  if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+    myproc()->trapframe->a0 = syscalls[num]();
   } else {
-    printf("unknown syscall %d\n", num);
-    p->trapframe->a0 = -1;
+    printf("unknown sys call %d\n", num);
+    myproc()->trapframe->a0 = -1;
   }
 }
 
