@@ -7,6 +7,7 @@
 #include "syscall.h"
 #include "defs.h"
 
+
 // Fetch the uint64 at addr from the current process.
 int
 fetchaddr(uint64 addr, uint64 *ip)
@@ -141,6 +142,8 @@ static uint64 (*syscalls[])(void) = {
 };
 //////////////////////////////////////////////////////////////////////////////////////
 
+static int syscall_counts[NELEM(syscalls)] = {0};
+
 
 ///////////////////////////////////////////////////////////////
 static char *syscall_names[] = {
@@ -256,7 +259,6 @@ void print_syscall(struct proc *p, int num, uint64 args[], uint64 ret);
 //[                                                                    ]//
 
 
-static int syscall_counts[NELEM(syscalls)] = {0};
 ////////////[OLD SYS CALL ]/////////////////////////////////////////////////////
 /*
 void

@@ -101,21 +101,28 @@ exec(char *path, char **argv)
   }
   ustack[argc] = 0;
 
-  // just added this
   // Check for --trace-mask and set the trace mask
   for (int i = 0; i < argc; i++) {
-  if (strcmp(argv[i], "--trace-mask") == 0 && i + 1 < argc) {
-    p->trace_mask = atoi(argv[i + 1]);
-    // Shift remaining arguments to remove --trace-mask and its value
-    for (int j = i; j < argc - 2; j++) {
-      argv[j] = argv[j + 2];
-    }
-    argv[argc - 2] = 0;
-    argv[argc - 1] = 0;
-    argc -= 2;
-    break;
+    if (strncmp(argv[i], "--trace-mask") == 0 && i + 1 < argc) {
+      // Simple string-to-int conversion instead of atoi
+      int mask = 0;
+      char *mask_str = argv[i + 1];
+      while (*mask_str && *mask_str >= '0' && *mask_str <= '9') {
+        mask = mask * 10 + (*mask_str - '0');
+        mask_str++;
       }
+      p->trace_mask = mask;
+      // Shift remaining arguments to remove --trace-mask and its value
+      for (int j = i; j < argc - 2; j++) {
+        argv[j] = argv[j + 2];
+      }
+      argv[argc - 2] = 0;
+      argv[argc - 1] = 0;
+      argc -= 2;
+      break;
     }
+  }
+
   // push the array of argv[] pointers.
   sp -= (argc+1) * sizeof(uint64);
   sp -= sp % 16;
@@ -145,7 +152,7 @@ exec(char *path, char **argv)
 
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 
- bad:
+bad:
   if(pagetable)
     proc_freepagetable(pagetable, sz);
   if(ip){

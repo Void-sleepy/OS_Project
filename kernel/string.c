@@ -11,6 +11,7 @@ memset(void *dst, int c, uint n)
   return dst;
 }
 
+
 int
 memcmp(const void *v1, const void *v2, uint n)
 {
