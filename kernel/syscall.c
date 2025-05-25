@@ -35,7 +35,7 @@ static void
 argraw(int n, uint64 *ip)
 {
   struct proc *p = myproc();
-  printf("argraw: n=%d, proc=%p, trapframe=%p\n", n, p, p ? p->trapframe : 0);
+  //printf("argraw: n=%d, proc=%p, trapframe=%p\n", n, p, p ? p->trapframe : 0);
   if (p == 0 || p->trapframe == 0) {
     panic("argraw: invalid proc or trapframe");
   }
@@ -67,7 +67,7 @@ argint(int n, int *ip)
 void
 argaddr(int n, uint64 *ip)
 {
-    argraw(n, ip);
+  argraw(n, ip);
 }
 
 // Fetch the nth word-sized system call argument as a null-terminated string.
@@ -284,17 +284,21 @@ syscall(void)
 
 ////////////////[New sys call  the "coooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooler one" ]////////////////////////////////////////////
 // System call dispatcher with statistics
-void
-syscall(void)
-{
-  int num = myproc()->trapframe->a7;
-  printf("syscall: num=%d\n", num);
-  if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    myproc()->trapframe->a0 = syscalls[num]();
-  } else {
-    printf("unknown sys call %d\n", num);
-    myproc()->trapframe->a0 = -1;
-  }
+
+void syscall(void) {
+    int num = myproc()->trapframe->a7;
+    struct proc *p = myproc();
+    uint64 args[3] = {0};
+    for (int i = 0; i < 3; i++) argraw(i, &args[i]);
+    if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+        uint64 ret = syscalls[num]();
+        if (p->trace_mask & (1 << num)) {
+            print_syscall(p, num, args, ret);
+        }
+        p->trapframe->a0 = ret;
+    } else {
+        p->trapframe->a0 = -1;
+    }
 }
 
 ///////////////////////////////////////////////////////////////
