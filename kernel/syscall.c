@@ -285,20 +285,21 @@ syscall(void)
 ////////////////[New sys call  the "coooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooler one" ]////////////////////////////////////////////
 // System call dispatcher with statistics
 
-void syscall(void) {
-    int num = myproc()->trapframe->a7;
-    struct proc *p = myproc();
-    uint64 args[3] = {0};
-    for (int i = 0; i < 3; i++) argraw(i, &args[i]);
-    if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-        uint64 ret = syscalls[num]();
-        if (p->trace_mask & (1 << num)) {
-            print_syscall(p, num, args, ret);
-        }
-        p->trapframe->a0 = ret;
-    } else {
-        p->trapframe->a0 = -1;
+void
+syscall(void)
+{
+  struct proc *p = myproc();
+  int num = p->trapframe->a7;
+  if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+    p->trapframe->a0 = syscalls[num]();
+    syscall_counts[num]++;  // Increment always
+    if (p->trace_mask & (1 << num)) {
+      printf("%d: sys %d -> %ld\n", p->pid, num, p->trapframe->a0);
     }
+  } else {
+    printf("%d %s: unknown sys call %d\n", p->pid, p->name, num);
+    p->trapframe->a0 = -1;
+  }
 }
 
 ///////////////////////////////////////////////////////////////
