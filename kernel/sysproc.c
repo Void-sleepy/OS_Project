@@ -100,8 +100,8 @@ sys_uptime(void)
 uint64
 sys_trace(void)
 {
-  int mask;
-  argint(0, &mask);                       // Fetch the trace mask argument
+  uint32 mask;  //  unsigned int
+  argint(0, (int*)&mask);  // Cast to int* for argint
   struct proc *p = myproc();
   p->trace_mask = mask;
   return 0;

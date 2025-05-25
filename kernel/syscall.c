@@ -290,11 +290,22 @@ syscall(void)
 {
   struct proc *p = myproc();
   int num = p->trapframe->a7;
+  static char *syscall_names[] = {
+    [SYS_fork] "fork", [SYS_exit] "exit", [SYS_wait] "wait",
+    [SYS_pipe] "pipe", [SYS_read] "read", [SYS_write] "write",
+    [SYS_close] "close", [SYS_kill] "kill", [SYS_exec] "exec",
+    [SYS_open] "open", [SYS_mknod] "mknod", [SYS_unlink] "unlink",
+    [SYS_fstat] "fstat", [SYS_link] "link", [SYS_mkdir] "mkdir",
+    [SYS_chdir] "chdir", [SYS_dup] "dup", [SYS_getpid] "getpid",
+    [SYS_sbrk] "sbrk", [SYS_sleep] "sleep", [SYS_uptime] "uptime",
+    [SYS_trace] "trace", [SYS_stats] "stats", [SYS_socket] "socket",
+    [SYS_gettime] "gettime", [SYS_mmap] "mmap"
+  };
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     p->trapframe->a0 = syscalls[num]();
-    syscall_counts[num]++;  // Increment always
+    syscall_counts[num]++;
     if (p->trace_mask & (1 << num)) {
-      printf("%d: sys %d -> %ld\n", p->pid, num, p->trapframe->a0);
+      printf("\n%d: %s -> %ld\n", p->pid, syscall_names[num] ? syscall_names[num] : "unknown", p->trapframe->a0);
     }
   } else {
     printf("%d %s: unknown sys call %d\n", p->pid, p->name, num);
