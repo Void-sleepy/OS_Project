@@ -285,34 +285,21 @@ syscall(void)
 ////////////////[New sys call  the "coooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooler one" ]////////////////////////////////////////////
 // System call dispatcher with statistics
 
-void
-syscall(void)
-{
-  struct proc *p = myproc();
-  int num = p->trapframe->a7;
-  static char *syscall_names[] = {
-    [SYS_fork] "fork", [SYS_exit] "exit", [SYS_wait] "wait",
-    [SYS_pipe] "pipe", [SYS_read] "read", [SYS_write] "write",
-    [SYS_close] "close", [SYS_kill] "kill", [SYS_exec] "exec",
-    [SYS_open] "open", [SYS_mknod] "mknod", [SYS_unlink] "unlink",
-    [SYS_fstat] "fstat", [SYS_link] "link", [SYS_mkdir] "mkdir",
-    [SYS_chdir] "chdir", [SYS_dup] "dup", [SYS_getpid] "getpid",
-    [SYS_sbrk] "sbrk", [SYS_sleep] "sleep", [SYS_uptime] "uptime",
-    [SYS_trace] "trace", [SYS_stats] "stats", [SYS_socket] "socket",
-    [SYS_gettime] "gettime", [SYS_mmap] "mmap"
-  };
-  if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    p->trapframe->a0 = syscalls[num]();
-    syscall_counts[num]++;
-    if (p->trace_mask & (1 << num)) {
-      printf("\n%d: %s -> %ld\n", p->pid, syscall_names[num] ? syscall_names[num] : "unknown", p->trapframe->a0);
+void syscall(void) {
+    int num = myproc()->trapframe->a7;
+    struct proc *p = myproc();
+    uint64 args[3] = {0};
+    for (int i = 0; i < 3; i++) argraw(i, &args[i]);
+    if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+        uint64 ret = syscalls[num]();
+        if (p->trace_mask & (1 << num)) {
+            print_syscall(p, num, args, ret);
+        }
+        p->trapframe->a0 = ret;
+    } else {
+        p->trapframe->a0 = -1;
     }
-  } else {
-    printf("%d %s: unknown sys call %d\n", p->pid, p->name, num);
-    p->trapframe->a0 = -1;
-  }
 }
-
 ///////////////////////////////////////////////////////////////
 
 
